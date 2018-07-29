@@ -10,6 +10,8 @@ class test:
         self.windowName = "test"
         self.screen = pygame.display.set_mode(self.windowSize)
 
+        self.squareSize = 32
+
         self.Window = Window(self.screen)
 
     def Main(self):
@@ -30,7 +32,7 @@ class test:
 class Window:
     def __init__(self, screen):
         self.screen = screen
-        self.player = pygame.image.load("../pictures/mon_016.bmp")
+        self.player = pygame.image.load("../pictures/mon_016.bmp").convert_alpha()
         self.Update = self.TestWindow
 
     def TestWindow(self):
