@@ -2,20 +2,21 @@ import pygame
 from pygame.locals import *
 import sys
 
-from testModules import Character
+from testHelper import Character, Grid
 
 class test:
     def __init__(self):
         #parameter
         self.windowSize = [1500, 800]
         self.pageColor = (255,255,255)
+        self.squareSize = 32
         self.windowName = "test"
         self.screen = pygame.display.set_mode(self.windowSize)
 
-        self.squareSize = 32
 
-        self.Player = Character(self, picturepath="../../pictures/mon_016.bmp")
+        self.Player = Character(self, picturepath="../../pictures/mon_016.bmp", mode="player")
         self.Window = Window(self)
+        self.Grid = Grid(self)
 
     def Main(self):
         pygame.display.set_caption(self.windowName)
@@ -24,6 +25,7 @@ class test:
             self.screen.fill(self.pageColor)
 
             self.Window.Update()
+            self.Grid.Update()
 
             for event in pygame.event.get():
                 if event.type == QUIT:
