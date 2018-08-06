@@ -4,23 +4,27 @@ import sys
 
 class Character:
     def __init__(self, MainClass, **kwargs):
+        self.ArgumentSetting(MainClass, kwargs)
+
+        self.nextPos = self.position
+
+    def ArgumentSetting(self, MainClass, options):
         self.mainClass = MainClass
         self.options = {"name" : "名無し",
                         "picturepath" : "../../pictures/mon_016.bmp",
                         "position" : (0, 0),
+                        "scale" : (),
                         "mode" : "object"}
-        self.options.update(kwargs)
+        self.options.update(options)
         
         self.Modes = {"object" : None,
-                     "player" : PlayerMode(MainClass)}
+                     "player" : PlayerMode(self)}
 
         self.characterHelper = CharacterHelper()
         self.screen = self.mainClass.screen
         self.picture = self.characterHelper.PictureLoad(self.options["picturepath"], size=[self.mainClass.squareSize, self.mainClass.squareSize])
         self.mode = self.Modes[self.options["mode"]]
         self.position = self.options["position"]
-
-        self.nextPos = self.position
 
     def Update(self):
         self.nextPos = self.position
@@ -38,15 +42,15 @@ class CharacterHelper:
 class PlayerMode:
     def __init__(self, CharaClass):
         self.CharaClass = CharaClass
-        self.keyPressed = pygame.key.get_pressed()
+        self.mainClass = self.CharaClass.mainClass
+        self.KeyBoard = self.mainClass.KeyBoard
 
     def Move(self):
         pass
 
     def Update(self):
-        self.keyPressed = pygame.key.get_pressed()
-        if self.keyPressed[K_RIGHT]-self.keyPressed[K_LEFT]:
-            print(self.keyPressed[K_RIGHT]-self.keyPressed[K_LEFT])
+        if self.KeyBoard.IsHorizontalDown():
+            print(self.KeyBoard.IsHorizontalDown())
 
 class Grid:
     def __init__(self, MainClass):
@@ -66,8 +70,50 @@ class Grid:
 
 class KeyBoard:
     def __init__(self):
-        pass
+        self.nowPressed = pygame.key.get_pressed()
+        self.previousPressed = self.nowPressed
+        self.intHorizontalKey = self.nowPressed[K_RIGHT] - self.nowPressed[K_LEFT]
+        self.previousIntHorizontalKey = self.intHorizontalKey
+        self.intVerticalKey = self.nowPressed[K_UP] - self.nowPressed[K_DOWN]
+        self.previousIntVerticalKey = self.intVerticalKey
+
     def ShowKeyName(self):
         keyPressed = pygame.key.get_pressed()
         if any(keyPressed):
             print(pygame.key.name(keyPressed.index(1)))
+
+    def EarlyUpdate(self):
+        self.nowPressed = pygame.key.get_pressed()
+        #順序注意
+        self.intHorizontalKey = self.nowPressed[K_RIGHT] - self.nowPressed[K_LEFT]
+        self.intVerticalKey = self.nowPressed[K_UP] - self.nowPressed[K_DOWN]
+
+    def LaterUpdate(self):
+        self.previousPressed = self.nowPressed
+        self.previousIntHorizontalKey = self.intHorizontalKey
+        self.previousIntVerticalKey = self.intVerticalKey
+
+    def IsKeyDown(self, KEYNAME):
+        result = False
+
+        if self.nowPressed[KEYNAME] and not self.previousPressed[KEYNAME]:
+            result = True
+
+        return result
+
+    def IsHorizontalDown(self):
+        return self.intHorizontalKey and not self.previousIntHorizontalKey
+
+    def IsVerticalDown(self):
+        return self.intVerticalKey and not self.previousIntVerticalKey
+
+class Time:
+    def __init__(self):
+        self.nowTime = pygame.time.get_ticks() * 1e-3
+        self.previousTime = 0
+        self.deltaTime = self.nowTime - self.previousTime
+
+    def EarlyUpdate(self):
+        self.nowTime = pygame.time.get_ticks() * 1e-3
+        self.deltaTime = self.nowTime - self.previousTime
+        self.previousTime = self.nowTime
