@@ -6,12 +6,7 @@ from testHelper import Character, Grid, KeyBoard, Time
 
 class test:
     def __init__(self):
-        #parameter
-        self.windowSize = [1500, 800]
-        self.pageColor = (255,255,255)
-        self.squareSize = 32
-        self.windowName = "test"
-        self.screen = pygame.display.set_mode(self.windowSize)
+        self.WindowSetting()
         self.KeyBoard = KeyBoard()
         self.Time = Time()
         #順序注意
@@ -19,7 +14,6 @@ class test:
         self.Window = Window(self)
         self.Grid = Grid(self)
         
-
     def Main(self):
         pygame.display.set_caption(self.windowName)
         pygame.init()
@@ -38,12 +32,19 @@ class test:
 
             pygame.display.update()
 
+    def WindowSetting(self):
+        #parameter
+        self.windowSize = [1500, 800]
+        self.pageColor = (255,255,255)
+        self.squareSize = 32
+        self.windowName = "test"
+        self.screen = pygame.display.set_mode(self.windowSize)
     def EarlyUpdate(self):
         self.screen.fill(self.pageColor)
         self.KeyBoard.EarlyUpdate()
         self.Time.EarlyUpdate()
-
     def LaterUpdate(self):
+        #最後に実行
         self.KeyBoard.LaterUpdate()
 
 

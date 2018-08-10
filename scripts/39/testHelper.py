@@ -8,11 +8,14 @@ class Character:
 
         self.nextPos = self.position
 
+    def Parameters(self):
+        pass
+
     def ArgumentSetting(self, MainClass, options):
         self.mainClass = MainClass
         self.options = {"name" : "名無し",
                         "picturepath" : "../../pictures/mon_016.bmp",
-                        "position" : (0, 0),
+                        "position" : [0, 0],
                         "scale" : (),
                         "mode" : "object"}
         self.options.update(options)
@@ -27,7 +30,6 @@ class Character:
         self.position = self.options["position"]
 
     def Update(self):
-        self.nextPos = self.position
         self.screen.blit(self.picture, self.position)
         self.mode.Update()
 
@@ -44,13 +46,31 @@ class PlayerMode:
         self.CharaClass = CharaClass
         self.mainClass = self.CharaClass.mainClass
         self.KeyBoard = self.mainClass.KeyBoard
+        self.Time = self.mainClass.Time
+        self.deltaTime = 0
+        self.moveDirection = [0, 0]
+
+        self.speed = 0.
 
     def Move(self):
-        pass
+        self.moveDirection = [self.CharaClass.nextPos[0] - self.CharaClass.position[0], self.CharaClass.nextPos[1] - self.CharaClass.position[1]]
+        magni = (self.moveDirection[0]**2+self.moveDirection[1]**2)**(1/2)
+        if magni != 0:
+            self.moveDirection = [self.moveDirection[0]/magni, self.moveDirection[1]/magni]
+
+        #self.CharaClass.position = self.CharaClass.nextPos
+        if self.CharaClass.position != self.CharaClass.nextPos:
+            #self.CharaClass.position = [self.moveDirection[0] * self.deltaTime, self.moveDirection[1] * self.deltaTime]
+            self.CharaClass.position[0] += self.moveDirection[0] * self.deltaTime * self.speed
+            self.CharaClass.position[1] += self.moveDirection[1] * self.deltaTime * self.speed
 
     def Update(self):
+        self.Move()
+        self.deltaTime = self.Time.deltaTime
         if self.KeyBoard.IsHorizontalDown():
-            print(self.KeyBoard.IsHorizontalDown())
+            self.CharaClass.nextPos[0] += self.KeyBoard.intHorizontalKey * self.mainClass.squareSize
+        if self.KeyBoard.IsVerticalDown():
+            self.CharaClass.nextPos[1] -= self.KeyBoard.intVerticalKey * self.mainClass.squareSize
 
 class Grid:
     def __init__(self, MainClass):
