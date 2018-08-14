@@ -2,21 +2,21 @@ import pygame
 from pygame.locals import *
 import sys
 
-import __Main
+import Base
 
 #=================ver0.0.1==================
-class MainClass(__Main.BaseMainClass):
+class MainClass(Base.BaseMainClass):
     def __init__(self):
         super().__init__()
 
         self.Helper = HelperClass(self)
         self.Window = StageClass(self)
 
-class ObjectClass(__Main.BaseObjectClass):
+class ObjectClass(Base.BaseObjectClass):
     def __init__(self, MainClass, **kwargs):
         super().__init__(MainClass, kwargs)
 
-class PlayerClass(__Main.BasePlayerClass):
+class PlayerClass(Base.BasePlayerClass):
     def __init__(self, MainClass, **kwargs):
         super().__init__(MainClass, kwargs)
 
@@ -71,7 +71,7 @@ class PlayerClass(__Main.BasePlayerClass):
         result = all(list(map(lambda point : self.MainClass.Window.IsInArea(point), self.Area(deltaNewPos+self.nextPos))))
         return result
 
-class StageClass(__Main.BaseStageClass):
+class StageClass(Base.BaseStageClass):
     def __init__(self, MainClass, **kwargs):
         super().__init__(MainClass, kwargs)
 
@@ -121,7 +121,7 @@ class StageClass(__Main.BaseStageClass):
 
         return result
 
-class HelperClass(__Main.BaseHelperClass):
+class HelperClass(Base.BaseHelperClass):
     def __init__(self, MainClass):
         super().__init__(MainClass)
 
