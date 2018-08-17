@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import sys
+import os
 
 import __Main
 
@@ -53,9 +54,9 @@ class PlayerClass(__Main.BasePlayerClass):
 
         #移動目的地の設定 : 入力はあるけど到着している→出発の瞬間
         if self.DeltaPositionVectorDot <= 0:
-                
+
             self.position = pygame.math.Vector2(self.nextPos)
-                    
+
             if self.ConditionArea():
                 self.nextPos += (self.HorizontalDirection * pygame.math.Vector2(1, 0) + self.VerticalDirection * pygame.math.Vector2(0, -1)) * self.MainClass.squareSize
 
