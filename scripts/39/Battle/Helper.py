@@ -11,8 +11,8 @@ class Button:
         self.options = {"rect" : [0, 0, 300, 100],
                         "type" : "IsOnDown",
                         "func" : lambda:print("Btn pushed!"),
-                        "picturename" : "../../pictures/default_btn3.png",
-                        "font" : "../../documents/IPAexfont00301/ipaexg.ttf",
+                        "picturename" : "../../../pictures/normalPanel.png",
+                        "font" : "../../../documents/IPAexfont00301/ipaexg.ttf",
                         "text" : "ボタン",
                         "textColor" : pygame.Color("BLACK")}
         self.options.update(kwargs)
@@ -51,7 +51,8 @@ class ButtonAction:
 
     def IsOnDown(self):
         result = False
-
+        self.rect = self.Rect()
+        
         if self.mousePressed[0] and not self.previousPressed[0]:
             if self.rect[0] <= self.mousePos[0] <= self.rect[0]+self.rect[2] and self.rect[1] <= self.mousePos[1] <= self.rect[1]+self.rect[3]:
                 result = True
@@ -68,7 +69,7 @@ class BattleHelper(BaseHelper.BattleHelper):
 
         #Fade In 001
         self.pictureSize001 = (self.windowSize[0]+350, self.windowSize[1])
-        self.fadePicture001 = BattleHelper.ScaledPicture("../../pictures/myFade.png", size=self.pictureSize001)
+        self.fadePicture001 = BattleHelper.ScaledPicture("../../../pictures/myFade.png", size=self.pictureSize001)
         self.position001 = pygame.math.Vector2(-300, 0)
 
     def FadeIn001(self):
