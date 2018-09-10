@@ -1,7 +1,8 @@
+
 """
 アニメーションの構造
-Base2を要求
 """
+
 import pygame
 from pygame.locals import *
 import sys
@@ -9,114 +10,29 @@ import sys
 import Helper
 from Helper import BattleHelper
 
-import Super1 as Super
+import Sub1 as Sub
 
-class MainClass(Super.MainClass):
-    def __init__(self):
-        super().__init__()
+class ObjectClass(Sub.ObjectClass):
+    def __init__(self, MainClass, kwargs):
+        super().__init__(MainClass, kwargs)
+        self.Helper = MainClass.Helper
 
-        if __name__ == "__main__":
-            self.BattleHelper = BattleHelper
-            self.IconCharacterClass = IconCharacterClass
-            self.FieldCharacterClass = FieldCharacterClass
-            self.FieldEnemyClass = FieldEnemyClass
-
-            self.AllAnimationController = AllAnimationController
-            self.ContinueAnimation = ContinueAnimation
-            self.OneCommandAnimation = OneCommandAnimation
-            self.PieceAnimation = PieceAnimation
-
-            self.Helper = self.BattleHelper(self)
-
-    def Main(self):
-        #変数セット
-        self.Action = self.Start
-
-        while True:
-            self.Helper.EarlyUpdate()
-
-            if self.Action != None:
-                self.Action()
-
-            self.Helper.LateUpdate()
-
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-
-            pygame.display.update()
-
-    def Start(self):
-        super().Start()
-        self.SetAnimation()
-
-    def SetAnimation(self):
-        testAnimTarget = self.family + self.enemies
-        testComAnimList = [target.CommandAnimationDic["mudaniHustle"] for target in testAnimTarget]
-        kwargs = {
-            "isRepeat" : True
-            }
-        testContiAnim = self.ContinueAnimation(testComAnimList, kwargs)
-        testContiAnimList = [testContiAnim]
-
-        self.AnimationController = self.AllAnimationController(testContiAnimList)
+        self.OneCommandAnimation = MainClass.OneCommandAnimation
 
     def Update(self):
-        super().Update()
-        self.AnimationUpdate()
+        self.HelperUpdate()
+
+        self.Draw()
+        self.BtnUpdate()
+
+    def HelperUpdate(self):
+        self.BtnAction.mousePos = self.Helper.mousePos
+        self.BtnAction.mousePressed = self.Helper.mousePressed
+        self.BtnAction.previousPressed = self.Helper.previousPressed
 
     def AnimationUpdate(self):
-        self.AnimationController.Main()
-
-
-class IconCharacterClass(Super.IconCharacterClass):
-    def __init__(self, MainClass, Character, kwargs):
-        super().__init__(MainClass, Character, kwargs)
-
-    def SetHPbar(self):
-        super().SetHPbar()
-        self.CharaClass.IconClass = self
-        self.CharaClass.HPbarPicture = self.HPbarPicture
-
-class FieldCharacterClass(Super.FieldCharacterClass):
-    def __init__(self, MainClass, kwargs):
-        super().__init__(MainClass, kwargs)
-
-        self.options.update({
-            "hp" : 100
-            })
-
-        self.hp = self.options["hp"]
-        self.HPbarPicture = None
-        self.IconClass = None
-
-        self.CommandAnimationDic = {
-            "jump" : self.OneCommandAnimation("jump", self, None),
-            "mudaniHustle" : self.OneCommandAnimation("mudaniHustle", self, None)
-            }
-
-    def Update(self):
-        super().Update()
-        self.ReflectHPbarPicture()
-
-    def ReflectHPbarPicture(self):
-        self.IconClass.HPbarPicture = self.HPbarPicture
-
-class FieldEnemyClass(Super.FieldEnemyClass):
-    def __init__(self, MainClass, kwargs):
-        super().__init__(MainClass, kwargs)
-
-        self.options.update({
-            "hp" : 100
-            })
-
-        self.hp = self.options["hp"]
-
-        self.CommandAnimationDic = {
-            "jump" : self.OneCommandAnimation("jump", self, None),
-            "mudaniHustle" : self.OneCommandAnimation("mudaniHustle", self, None)
-            }
+        if self.Animation != None:
+            self.Animation()
 
 class AllAnimationController:
     def __init__(self, ContiAnimList):
@@ -136,14 +52,19 @@ class AllAnimationController:
 class ContinueAnimation: #時間的に連続するアニメーション
     def __init__(self, CommandAnimationList, kwargs):
         self.options = {
-            "isRepeat" : False}
+            "isRepeat" : False,
+            "isAutoStart" : True}
         if kwargs != None:
             self.options.update(kwargs)
         self.UpdateFunc = self.RepeatUpdate if self.options["isRepeat"] else self.AutoEndUpdate
-        self.Action = self.Start
 
         self.CommandAnimationList = CommandAnimationList
-        self.indexOfAnimation = 0
+
+        if self.options["isAutoStart"]:
+            self.Action = self.Start
+            self.PlayON()
+        else:
+            self.Action = None
 
     def Main(self):
         if self.Action != None:
@@ -152,6 +73,7 @@ class ContinueAnimation: #時間的に連続するアニメーション
     def Start(self):
         self.noOfComAnim = len(self.CommandAnimationList)
         self.Action = self.Update
+        self.indexOfAnimation = 0
 
     def Update(self):
         self.UpdateFunc()
@@ -161,7 +83,6 @@ class ContinueAnimation: #時間的に連続するアニメーション
 
     def RepeatUpdate(self):
         comAnim = self.CommandAnimationList[self.indexOfAnimation]
-
         comAnim.Main()
         if comAnim.IsEndOfAnimation():
             self.indexOfAnimation += 1
@@ -177,11 +98,21 @@ class ContinueAnimation: #時間的に連続するアニメーション
         if comAnim.IsEndOfAnimation():
             self.indexOfAnimation += 1
 
-            if self.indexOfAnimation % self.noOfComAnim == 0:
+            if self.EndCondition():
                 self.Action = self.End
 
     def PlayON(self):
         list(map(lambda comAnim : comAnim.PlayON(), self.CommandAnimationList))
+
+        if self.IsEndOfAnimation():
+            self.Action = self.Start
+
+    def EndCondition(self):
+        return self.indexOfAnimation % self.noOfComAnim == 0
+
+    def IsEndOfAnimation(self):
+        return self.Action == None
+
 
 class OneCommandAnimation: #まとめて一つとするアニメーション
     def __init__(self, name, ObjectClass, kwargs):
@@ -242,20 +173,23 @@ class OneCommandAnimation: #まとめて一つとするアニメーション
         if self.UpdateFunc != None:
             self.UpdateFunc()
         list(map(lambda pieceAnime : pieceAnime.Main(), self.PieceAnimationList))
-        if self.IsEndOfAnimation():
+        if self.EndCondition():
             self.Action = self.End
 
     def End(self):
         self.Action = None
 
     def IsEndOfAnimation(self):
-        boolList = list(map(lambda pieceAnime : pieceAnime.isEndOfAnimation, self.PieceAnimationList))
+        return self.Action == None
+
+    def EndCondition(self):
+        boolList = list(map(lambda pieceAnim : pieceAnim.IsEndOfAnimation(), self.PieceAnimationList))
         return all(boolList)
 
     def PlayON(self):
-        if self.Action == None:
+        if self.IsEndOfAnimation():
             self.Action = self.Start
-        list(map(lambda pieceAnim : pieceAnim.PlayON(), self.PieceAnimationList))
+            list(map(lambda pieceAnim : pieceAnim.PlayON(), self.PieceAnimationList))
 
 class PieceAnimation:
     def __init__(self, name, ObjectClass, kwargs): #Animationの最小単位
@@ -338,7 +272,7 @@ class PieceAnimation:
             self.Action()
 
     def Start(self):
-
+        self.clock += self.Helper.pygamedeltatime
         if self.clock >= self.delayTime:
 
             if self.StartFunc != None:
@@ -349,11 +283,10 @@ class PieceAnimation:
 
     def Update(self):
         self.clock += self.Helper.pygamedeltatime
-
         if self.UpdateFunc != None:
             self.UpdateFunc()
 
-        if self.clock >= self.endTime + self.delayTime:
+        if self.EndCondition():
             self.Action = self.End
 
     def End(self):
@@ -362,9 +295,11 @@ class PieceAnimation:
         self.Action = None
 
     def PlayON(self):
-        if self.Action == None:
+        if self.IsEndOfAnimation():
             self.Action = self.Start
 
+    def EndCondition(self):
+        return self.clock >= self.endTime + self.delayTime
 
-if __name__ == "__main__":
-    MainClass().Main()
+    def IsEndOfAnimation(self):
+        return self.Action == None

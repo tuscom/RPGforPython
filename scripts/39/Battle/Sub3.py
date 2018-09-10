@@ -1,5 +1,5 @@
 """
-ボタン機能追加
+AllObject追加
 """
 
 import pygame
@@ -9,16 +9,16 @@ import sys
 import Helper
 from Helper import BattleHelper
 
-import Base2 as Base
+import Sub2 as Sub
 
-class ObjectClass(Base.ObjectClass):
+class ObjectClass(Sub.ObjectClass):
     def __init__(self, MainClass, kwargs):
         self.MainClass = MainClass
         self.BattleHelper = MainClass.BattleHelper
         self.Helper = MainClass.Helper
         self.screen = MainClass.screen
         self.OneCommandAnimation = MainClass.OneCommandAnimation
-        
+
         self.SetOptions(kwargs)
         self.SetParameter()
         self.SetButton()
@@ -41,22 +41,35 @@ class ObjectClass(Base.ObjectClass):
         self.BoolAction = self.BtnAction.IsOnDown
         self.BtnFunc = self.options["btnFunc"]
     def OnInstanceFunc(self):
-        self.MainClass.AllObjectList.append(self)
+        self.MainClass.AllObjectsList.append(self)
     def SetAction(self):
-        self.Action = self.Update
-        
-    def Update(self):
-        self.HelperUpdate()
+        self.Action = self.Start
 
-        self.Draw()
-        self.BtnUpdate()
+class AllAnimationController(Sub.AllAnimationController):
+    def __init__(self, ContiAnimList):
+        super().__init__(ContiAnimList)
 
-    def HelperUpdate(self):
-        self.BtnAction.mousePos = self.Helper.mousePos
-        self.BtnAction.mousePressed = self.Helper.mousePressed
-        self.BtnAction.previousPressed = self.Helper.previousPressed
+class ContinueAnimation(Sub.ContinueAnimation):
+    def __init__(self, CommandAnimationList, kwargs):
+        super().__init__(CommandAnimationList, kwargs)
 
-    def AnimationUpdate(self):
-        if self.Animation != None:
-            self.Animation()
+class OneCommandAnimation(Sub.OneCommandAnimation): 
+    def __init__(self, name, ObjectClass, kwargs):
+        super().__init__(name, ObjectClass, kwargs)
 
+class PieceAnimation(Sub.PieceAnimation):
+    def __init__(self, name, ObjectClass, kwargs): 
+        super().__init__(name, ObjectClass, kwargs)
+
+    def HPmoveUpdate(self):
+        clock = self.clock - self.delayTime
+        pictureScale = (
+            self.pictureScale[0]-self.speed*clock,
+            self.pictureScale[1])
+
+        picture = pygame.transform.scale(
+            self.HPbarPicture,
+            [int(pictureScale[0]), int(pictureScale[1])]
+            )
+
+        self.ObjectClass.SetHPbarPicture(picture)

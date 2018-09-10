@@ -1,7 +1,5 @@
 """
-描画
-ボタン
-Base1を要求
+SubX1を要求
 """
 
 import pygame
@@ -11,7 +9,7 @@ import sys
 import Helper
 from Helper import BattleHelper
 
-import Base3 as Base
+import SubX1 as Sub
 
 class MainClass:
     def __init__(self):
@@ -41,12 +39,13 @@ class MainClass:
         #派生実装
         if __name__ == "__main__":
             self.BattleHelper = BattleHelper
-            self.IconCharacterClass = IconCharacterClass
-            self.FieldCharacterClass = FieldCharacterClass
-            self.FieldEnemyClass = FieldEnemyClass
+            self.IconCharacterClass = Sub.IconCharacterClass
+            self.FieldCharacterClass = Sub.FieldCharacterClass
+            self.FieldEnemyClass = Sub.FieldEnemyClass
+            self.ObjectClass = Sub.Sub.ObjectClass
 
             self.Helper = self.BattleHelper(self)
-        self.Base = Base
+        self.Sub = Sub
 
     def Main(self):
         #変数セット
@@ -79,7 +78,7 @@ class MainClass:
             "scale" : pygame.math.Vector2(charaControllerRect[2], charaControllerRect[3]),
             "picturepath" : self.charaControllerPanelPicturePath
             }
-        self.charaControllerPanel = Base.ObjectClass(self, kwargs)
+        self.charaControllerPanel = self.ObjectClass(self, kwargs)
 
         self.familyIcons = []
         for i in range(len(self.family)):
@@ -96,7 +95,7 @@ class MainClass:
             "position" : attackBtnPos,
             "scale" : self.attackBtnScale
             }
-        self.attackBtn = Base.ObjectClass(self, kwargs)
+        self.attackBtn = self.ObjectClass(self, kwargs)
 
     def SetFieldCharacter(self):
         familyPictures = [
@@ -133,7 +132,7 @@ class MainClass:
             self.enemies.append(
                 self.FieldEnemyClass(self, kwargs)
                 )
-            self.enemies[-1].position = self.enemyPos + i * pygame.math.Vector2(-120, 120)
+            self.enemies[-1].position = self.enemyPos + i * pygame.math.Vector2(-140, 120)
     def Update(self):
         self.DrawBackGround()
         self.DrawFieldCharacter()
@@ -148,95 +147,6 @@ class MainClass:
     def DrawFieldCharacter(self):
         list(map(lambda family : family.Main(), self.family))
         list(map(lambda enemy : enemy.Main(), self.enemies))
-
-class IconCharacterClass(Base.ObjectClass):
-    def __init__(self, MainClass, CharaClass, kwargs):
-        super().__init__(MainClass, kwargs)
-        self.options.update({
-            "bgPicturePath" : "../../../pictures/normalPanel.png",
-            "HPbarPicturePath" : "../../../pictures/HPbar.png",
-            "HPbarbackPicturePath" : "../../../pictures/HPbar_back.png",
-            "HPbarThick" : 10
-            })
-        self.CharaClass = CharaClass
-
-    def Start(self):
-        super().Start()
-
-        self.SetScale()
-        self.SetHPbar()
-        self.SetHPbarPosition()
-        self.SetbgPicture()
-        self.SetCharacterPicture()
-
-    def SetScale(self):
-        self.charaControllerRect = self.MainClass.Helper.NormToWorldRect(self.MainClass.charaControllerLayout)
-        self.scale = pygame.math.Vector2(self.charaControllerRect[3], self.charaControllerRect[3])
-    def SetHPbar(self):
-        self.HPbarScale = pygame.math.Vector2(self.scale.x, self.options["HPbarThick"])
-        self.HPbarPos = pygame.math.Vector2()
-        self.HPbarPicture = self.BattleHelper.ScaledPicture(
-            self.options["HPbarPicturePath"],
-            (int(self.HPbarScale.x), int(self.HPbarScale.y))
-            )
-        self.HPbarbackPicture = self.BattleHelper.ScaledPicture(
-            self.options["HPbarbackPicturePath"],
-            (int(self.HPbarScale.x), int(self.HPbarScale.y))
-            )
-    def SetbgPicture(self):
-        self.bgPicture = self.BattleHelper.ScaledPicture(
-            self.options["bgPicturePath"],
-            (self.charaControllerRect[3], self.charaControllerRect[3])
-            )
-    def SetCharacterPicture(self):
-        self.picture = pygame.transform.scale(self.CharaClass.picture, (self.charaControllerRect[3], self.charaControllerRect[3]))
-
-    def SetHPbarPosition(self):
-        self.HPbarPos = self.position + pygame.math.Vector2(0, 1) * (self.scale.y - self.HPbarScale.y)
-
-    def Draw(self):
-        self.screen.blit(self.bgPicture, self.position)
-        self.screen.blit(self.picture, self.position)
-        self.screen.blit(self.HPbarbackPicture, self.HPbarPos)
-        self.screen.blit(self.HPbarPicture, self.HPbarPos)
-
-class FieldCharacterClass(Base.ObjectClass):
-    def __init__(self, MainClass, kwargs):
-        super().__init__(MainClass, kwargs)
-        self.options.update({
-            
-            })
-
-class FieldEnemyClass(Base.ObjectClass):
-    def __init__(self, MainClass, kwargs):
-        super().__init__(MainClass, kwargs)
-        self.options.update({
-            "HPbarPicturePath" : "../../../pictures/HPbar.png",
-            "HPbarbackPicturePath" : "../../../pictures/HPbar_back.png",
-            "HPbarThick" : 10
-            })
-
-    def Start(self):
-        super().Start()
-        self.SetHPbar()
-
-    def SetHPbar(self):
-        self.HPbarScale = pygame.math.Vector2(self.scale.x, self.options["HPbarThick"])
-        self.HPbarPos = pygame.math.Vector2(self.position) + pygame.math.Vector2((self.scale.x - self.HPbarScale.x)/2, self.scale.y)
-
-        self.HPbarPicture = BattleHelper.ScaledPicture(
-            self.options["HPbarPicturePath"],
-            BattleHelper.Vector2ToIntlist(self.HPbarScale)
-            )
-        self.HPbarbackPicture = BattleHelper.ScaledPicture(
-            self.options["HPbarbackPicturePath"],
-            BattleHelper.Vector2ToIntlist(self.HPbarScale)
-            )
-
-    def Draw(self):
-        super().Draw()
-        self.screen.blit(self.HPbarbackPicture, self.HPbarPos)
-        self.screen.blit(self.HPbarPicture, self.HPbarPos)
 
 if __name__ == "__main__":
     MainClass().Main()
