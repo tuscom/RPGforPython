@@ -1,6 +1,9 @@
 import pygame
 from pygame.locals import *
 import sys
+import random
+import copy
+import math
 
 import Helper
 from Helper import BattleHelper
@@ -91,7 +94,8 @@ class OneCommandAnimation(Sub.OneCommandAnimation):
             "jump" : self.Jump,
             "mudaniHustle" : self.MudaniHustle,
             "ShowBattleMenu" : self.ShowBattleMenu,
-            "BackBattleMenu" : self.BackBattleMenu}
+            "BackBattleMenu" : self.BackBattleMenu,
+            "explosion" : self.Explosion}
 
         self.indexDict[name]()
 
@@ -99,6 +103,12 @@ class OneCommandAnimation(Sub.OneCommandAnimation):
     def BackBattleMenu(self):
         self.PieceAnimationList = [
             self.PieceAnimation("BackBattleMenu", self.ObjectClass, None)
+            ]
+
+    #爆破
+    def Explosion(self):
+        self.PieceAnimationList = [
+            self.PieceAnimation("explosion", self.ObjectClass, None)
             ]
 
 class PieceAnimation(Sub.PieceAnimation):
@@ -147,7 +157,8 @@ class PieceAnimation(Sub.PieceAnimation):
             "HPmoveForAttack" : self.HPmoveForAttack,
             "ShowBattleMenu" : self.ShowBattleMenu,
             "BackBattleMenu" : self.BackBattleMenu,
-            "NormalAttackEffect" : self.NormalAttackEffect}
+            "NormalAttackEffect" : self.NormalAttackEffect,
+            "explosion" : self.Explosion}
 
         self.indexDic[name]()
 
@@ -170,3 +181,32 @@ class PieceAnimation(Sub.PieceAnimation):
     def BackBattleMenuStart(self):
         self.speedList = [(self.goalPosition - startPosition) / self.endTime for startPosition in self.startPosList]
         self.posList = [pygame.math.Vector2(startPosition) for startPosition in self.startPosList]
+
+    #爆破
+    def Explosion(self):
+        self.endTime = 1
+        self.range = 10
+        self.interval= 0.3
+        self.speed = 1
+        self.screen = self.MainClass.screen
+        self.StartFunc = self.ExplosionStart
+        self.UpdateFunc = self.ExplosionUpdate
+    def ExplosionStart(self):
+        self.centerPos = (pygame.math.Vector2(self.ObjectClass.position) + pygame.math.Vector2(self.ObjectClass.scale)) / 2
+        self.pictureList = [copy.deepcopy(self.MainClass.explosionPicture)]
+        self.gapV2 = pygame.math.Vector2(random.randint(-self.range, self.range), random.randint(-self.range, self.range))
+        self.posList = [self.centerPos+self.gapV2]
+    def ExplosionUpdate(self):
+        list(map(lambda pos:self.MoveForExplosion(pos), self.posList))
+        self.DrawForExplosion()
+        if math.ceil(self.clock*10) % int(self.interval*10) == 0:
+            self.pictureList.append(copy.deepcopy(self.MainClass.explosionPicture))
+            self.gapV2 = pygame.math.Vector2(random.randint(-self.range, self.range), random.randint(-self.range, self.range))
+            self.posList.append(self.centerPos+self.gapV2)
+
+    def MoveForExplosion(self, pos):
+        deltatime = self.Helper.pygamedeltatime
+        pos += self.speed * deltatime * pygame.math.Vector2(0, -1)
+    def DrawForExplosion(self):
+        for i in range(self.noOfPicture):
+            self.screen.blit(self.pictureList[i], self.posList[i])

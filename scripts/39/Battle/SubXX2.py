@@ -42,6 +42,8 @@ class FieldFamilyClass(SubXX.FieldFamilyClass):
 
         self.Draw()
         self.BtnUpdate()
+        self.HPEvent()
+
 
 class FieldEnemyClass(SubXX.FieldEnemyClass):
     def __init__(self, MainClass, kwargs):
@@ -73,6 +75,7 @@ class FieldEnemyClass(SubXX.FieldEnemyClass):
 
         self.Draw()
         self.BtnUpdate()
+        self.HPEvent()
 
     def OnClick(self):
         self.Selected()

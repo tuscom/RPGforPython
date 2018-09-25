@@ -46,6 +46,8 @@ class FieldCharacterClass(SubX4.FieldCharacterClass):
         self.battleMenuFunc = self.options["menuFunc"]
         self.name = self.options["name"]
 
+        self.previousHP = self.hp
+
     def ChangeAttackCmd(self, name):
         self.AttackCommand = self.CommandAnimationDic[name]
 
@@ -70,8 +72,13 @@ class FieldCharacterClass(SubX4.FieldCharacterClass):
             "StartFunc" : lambda:BattleLog.ChangeText("{}はこうげきした！".format(self.name)),
             "EndFunc" : BattleLog.ResetText
             }
-        rightAttackStep = {
+        rightAttackStepKwargs = {
             "StartFunc" : lambda:BattleLog.ChangeText("{}はこうげきした！".format(self.name)),
+            "EndFunc" : BattleLog.ResetText
+            }
+
+        explosionKwargs = {
+            "StartFunc" : lambda:BattleLog.ChangeText("{}はたおれた！".format(self.name)),
             "EndFunc" : BattleLog.ResetText
             }
 
@@ -79,10 +86,12 @@ class FieldCharacterClass(SubX4.FieldCharacterClass):
             "jump" : self.OneCommandAnimation("jump", self, jumpKwargs),
             "mudaniHustle" : self.OneCommandAnimation("mudaniHustle", self, mudaniHustleKwargs),
             "leftAttackStep" : self.OneCommandAnimation("leftAttackStep", self, leftAttackStepKwargs),
-            "rightAttackStep" : self.OneCommandAnimation("rightAttackStep", self, rightAttackStep)
+            "rightAttackStep" : self.OneCommandAnimation("rightAttackStep", self, rightAttackStepKwargs),
+            "explosion" : self.OneCommandAnimation("explosion", self, explosionKwargs)
             }
 
         self.AttackCommand = self.CommandAnimationDic["mudaniHustle"]
+        self.ExplosionCommand = self.CommandAnimationDic["explosion"]
 
     def AutoSelectAttackTarget(self):
         pass
@@ -92,6 +101,14 @@ class FieldCharacterClass(SubX4.FieldCharacterClass):
 
         self.Draw()
         self.BtnUpdate()
+        self.HPEvent()
+
+    def HPEvent(self):
+        if self.hp != self.previousHP:
+            if self.hp<=0:
+                FieldCharaOtherContiAnim = self.MainClass.FieldCharaOtherContiAnim
+                FieldCharaOtherContiAnim.CommandAnimationList = [self.ExplosionCommand]
+                FieldCharaOtherContiAnim.PlayON()
 
 class IconCharacterClass(SubX4.IconCharacterClass):
     def __init__(self, MainClass, CharaClass, kwargs):

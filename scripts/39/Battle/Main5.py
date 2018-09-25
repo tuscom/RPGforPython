@@ -52,6 +52,8 @@ class MainClass(MainModule.MainClass):
         #アニメーション
         self.normalAttackPicturePath = "../../../pictures/attack.png"
         self.normalAttackScale = copy.copy(self.charaSize)
+        self.explosionPicturePath = "../../../pictures/frame.png"
+        self.explosionPictureSize = (30, 30)
 
         #派生実装
         if __name__ == "__main__":
@@ -91,6 +93,7 @@ class MainClass(MainModule.MainClass):
         super().LoadMaterial()
         self.normalAttackPicture = self.BattleHelper.ScaledPicture(self.normalAttackPicturePath, self.normalAttackScale)
         self.targetIconPicture = self.BattleHelper.ScaledPicture(self.targetIconPicturePath, self.targetIconSize)
+        self.explosionPicture = self.BattleHelper.ScaledPicture(self.explosionPicturePath, self.explosionPictureSize)
 
     def SetAnimation(self):
         super().SetAnimation()
@@ -100,6 +103,13 @@ class MainClass(MainModule.MainClass):
             }
         self.ShowBattleMenuContiAnim = self.ContinueAnimation([], kwargs)
         self.ContinueAnimList.append(self.ShowBattleMenuContiAnim)
+
+        kwargs = {
+            "isRepeat" : False,
+            "isAutoStart" : False
+            }
+        self.FieldCharaOtherContiAnim = self.ContinueAnimation([], kwargs)
+        self.ContinueAnimList.append(self.FieldCharaOtherContiAnim)
 
     def SetWindow(self):
         pygame.init()
