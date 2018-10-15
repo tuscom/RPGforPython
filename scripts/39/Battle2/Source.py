@@ -1,7 +1,7 @@
 from Helper import BattleHelper
 import Helper
 
-from ObjectClass4 import ObjectClass
+from ObjectClass5 import ObjectClass
 from FieldCharacter5 import FieldCharacter
 from FieldEnemy4 import FieldEnemy
 from FieldFamily5 import FieldFamily
@@ -20,12 +20,12 @@ from Button1 import Button
 ・関数名：Mainバージョン数
 
 ================= Main ==================
-・__init__
-・Start:4
-・Update:4 
+・__init__():4, 5
+・Start():4, 5
+・Update():4, 5
 ・ControllerPanelParameter:4
 ・GetSource:4
-・ProgramParameter:4
+・ProgramParameter():4, 5
 ・SetPanel:4
 ・SetBackPanel:4
 ・SetFamilyIcon:4
@@ -34,6 +34,9 @@ from Button1 import Button
 ・AttackBtnOnClick:4
 ・ObjectSetActive:4
 ・SelectedSwitch:4
+・SceneParameter():5
+・SetTargetIconPicture():5
+・SetFade
 
 ============== FieldCharacter ================
 ・__init__:4

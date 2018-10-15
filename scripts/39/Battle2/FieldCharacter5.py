@@ -13,6 +13,22 @@ class FieldCharacter(OldFieldCharacter.FieldCharacter):
         self.OnInstanceFunc()
         self.SetObjAnimDic()
 
+    def SetOptions(self, kwargs):
+        self.options = {
+            "name" : "名無し",
+            "picturepath" : "../../../pictures/mon_016.bmp",
+            "position" : pygame.math.Vector2(),
+            "scale" : pygame.math.Vector2(100, 100),
+            "btnFunc" : None,
+            "speed" : 10,
+            "hp" : 100,
+            "attack" : 15,
+            "block" : 10,
+            "battleMenuName" : ["stepAttack", "jump"]
+            }
+        if kwargs != None:
+            self.options.update(kwargs)
+
     def ProgramParameter(self):
         super().ProgramParameter()
         self.IsAlive = True
@@ -40,7 +56,7 @@ class FieldCharacter(OldFieldCharacter.FieldCharacter):
         self.IsAlive = self.hp>0
         if oldIsAlive and not self.IsAlive:
             self.IsOnDead = True
-
+    #Others
     def IsAliveAttackTarget(self):
         return self.AttackTarget.hp > 0
 
@@ -48,6 +64,11 @@ class FieldCharacter(OldFieldCharacter.FieldCharacter):
         if not self.IsAliveAttackTarget():
             self.AutoSelectAttackTarget()
 
-    #Others
     def SetActive(self, boolean):
         self.enable = boolean
+
+    def CalcDamage(self, enemyAttackRatio):
+        enemyAttack = self.AttackTarget.options["attack"] * enemyAttackRatio
+        myBlock = self.options["block"]
+        result = enemyAttack - myBlock if enemyAttack > myBlock else 0
+        return result

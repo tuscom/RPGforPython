@@ -13,6 +13,17 @@ class FieldEnemy(OldFieldEnemy.FieldEnemy):
         self.OnInstanceFunc()
         self.SetObjAnimDic()
 
+    def SetOptions(self, kwargs):
+        self.FieldCharacter = self.MainClass.FieldCharacter
+        self.FieldCharacter.SetOptions(self, kwargs)
+        self.options.update({
+            "HPbarPicturePath" : "../../../pictures/HPbar.png",
+            "HPbarbackPicturePath" : "../../../pictures/HPbar_back.png",
+            "HPbarThick" : 10,
+            })
+        if kwargs != None:
+            self.options.update(kwargs)
+
     def SetObjAnimDic(self):
         kwargsAttack = {
             "ContinueName" : "battle",

@@ -46,7 +46,16 @@ class AllAnimationController(OldAllAnimationController.AllAnimationController):
                                 self.PieceAnimation.MoveBattleMenuUpdate],
             "frame" : [self.PieceAnimation.DeadFirstUsedStart,
                       self.PieceAnimation.DeadAfterUsedStart,
-                      self.PieceAnimation.DeadUpdate]
+                      self.PieceAnimation.DeadUpdate],
+            "FadeIn1" : [self.PieceAnimation.FadeIn1FirstUsedStart,
+                         self.PieceAnimation.FadeIn1AfterUsedStart,
+                         self.PieceAnimation.FadeIn1Update],
+            "FadeOut1" : [self.PieceAnimation.FadeOut1FirstUsedStart,
+                          self.PieceAnimation.FadeOut1AfterUsedStart,
+                          self.PieceAnimation.FadeOut1Update],
+            "Blackbolt" : [self.PieceAnimation.BlackboltFirstUsedStart,
+                           self.PieceAnimation.BlackboltAfterUsedStart,
+                           self.PieceAnimation.BlackboltUpdate]
             }# PieceAnimName : [FirstUsedStart, AfterUsedStart, Update]
         self.CmdAnimNameDic = {
             "jump" : ["jump"],
@@ -54,9 +63,16 @@ class AllAnimationController(OldAllAnimationController.AllAnimationController):
             "familyStepAttack" : ["leftstep", "enemyHPmove", "stepAttackEffect"],
             "showBattleMenu" : ["showBattleMenu"],
             "backBattleMenu" : ["backBattleMenu"],
-            "dead" : ["frame"]
+            "dead" : ["frame"],
+            "FadeIn1" : ["FadeIn1"],
+            "FadeOut1" : ["FadeOut1"],
+            "Blackbolt" : ["Blackbolt"]
             } #CmdAnimName : [PieceAnimName, PieceAnimName, ...]
 
+        self.CmdAnimKwargs = {
+            "enemyStepAttack" : {"attackRatio" : 2},
+            "familyStepAttack" : {"attackRatio" : 1}
+            }
 
     def ProgramOtherParameter(self):
         self.NextObj = None
@@ -75,6 +91,11 @@ class AllAnimationController(OldAllAnimationController.AllAnimationController):
         self.framePicture = self.MainClass.BattleHelper.ScaledPicture(
             self.framePicturePath,
             [80, 80]
+            )
+        self.blackboltPicturePath = "../../../pictures/blackbolt.png"
+        self.blackboltPicture = self.MainClass.BattleHelper.ScaledPicture(
+            self.blackboltPicturePath,
+            self.MainClass.charaSize
             )
     def Update(self):
         self.Play()
